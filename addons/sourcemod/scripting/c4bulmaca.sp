@@ -32,6 +32,7 @@ public Plugin myinfo =
 
 public void OnPluginStart()
 {
+	ServerCommand("sv_turbophysics 0");
 	PrecacheModel("models/weapons/w_c4_planted.mdl");
 	RegConsoleCmd("sm_c4", Command_C4Bulmaca, "");
 	RegConsoleCmd("sm_c4bulmaca", Command_C4Bulmaca, "");
@@ -352,7 +353,7 @@ public Action c4kontrol(Handle timer, int client)
 				if (C4 == 0)
 				{
 					PrintToChatAll("[SM] \x10%N\x01, Son C4'ü buldu ve \x10oyun sona erdi bulamayanlar öldü!", client);
-					for (int i = 1; i <= MaxClients; i++)if (IsValidClient(i))
+					for (int i = 1; i <= MaxClients; i++)if (IsValidClient(i) && GetClientTeam(i) == 2)
 					{
 						if (!Buldu[i])
 						{
@@ -378,7 +379,7 @@ public Action c4kontrol(Handle timer, int client)
 				{
 					SetEntityRenderColor(client, 0, 255, 0, 255);
 					PrintToChat(client, "[SM] \x05Doğru C4'ü buldun. \x10Artık diğer C4'leri göremezsin.");
-					PrintToChatAll("[SM] \x10%N\x01, C4 buldu. \x07Kalan C4: \x01%d", client, C4);
+					PrintToChatAll("[SM] \x10%N\x01, C4 buldu. \x04Kalan C4: \x01%d", client, C4);
 				}
 			}
 		}
