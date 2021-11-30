@@ -157,7 +157,10 @@ public int Menu_CallBack(Menu menu, MenuAction action, int client, int position)
 				{
 					Buldu[i] = false;
 					if (IsPlayerAlive(i) && GetClientTeam(i) == 2)
+					{
+						SetEntityRenderColor(i, 255, 0, 0, 255);
 						CS_RespawnPlayer(i);
+					}
 				}
 				GameStart = true;
 			}
@@ -320,6 +323,7 @@ public Action c4kontrol(Handle timer, int client)
 	{
 		if (client_checkc4[client] && IsValidEdict(client_checkc4[client]))
 		{
+			ScreenColor(client, { 255, 0, 0, 150 } );
 			ResetProgressBar(client);
 			char modelname[16];
 			GetEntPropString(client_checkc4[client], Prop_Data, "m_iName", modelname, 16);
@@ -340,6 +344,7 @@ public Action c4kontrol(Handle timer, int client)
 			}
 			else if (strcmp(modelname, "saklanbac_c4") == 0)
 			{
+				ScreenColor(client, { 0, 255, 0, 150 } );
 				CreateParticle(client, "weapon_confetti_balloons", 5.0);
 				RemoveEntity(client_checkc4[client]);
 				C4--;
@@ -355,7 +360,8 @@ public Action c4kontrol(Handle timer, int client)
 						}
 						else
 						{
-							PrintToChat(client, "[SM] \x05Tebrikler oyunu kazandınız!");
+							SetEntityRenderColor(i, 255, 255, 255, 255);
+							PrintToChat(i, "[SM] \x05Tebrikler oyunu kazandınız!");
 							Buldu[i] = false;
 						}
 					}
@@ -370,6 +376,7 @@ public Action c4kontrol(Handle timer, int client)
 				}
 				else
 				{
+					SetEntityRenderColor(client, 0, 255, 0, 255);
 					PrintToChat(client, "[SM] \x05Doğru C4'ü buldun. \x10Artık diğer C4'leri göremezsin.");
 					PrintToChatAll("[SM] \x10%N\x01, C4 buldu. \x07Kalan C4: \x01%d", client, C4);
 				}
@@ -379,6 +386,19 @@ public Action c4kontrol(Handle timer, int client)
 		client_timer[client] = null;
 	}
 	return Plugin_Stop;
+}
+
+void ScreenColor(int client, int Color[4])
+{
+	int clients[1];
+	clients[0] = client;
+	Handle message = StartMessageEx(GetUserMessageId("Fade"), clients, 1, 0);
+	Protobuf pb = UserMessageToProtobuf(message);
+	pb.SetInt("duration", 200);
+	pb.SetInt("hold_time", 40);
+	pb.SetInt("flags", 17);
+	pb.SetColor("clr", Color);
+	EndMessage();
 }
 
 void SetProgressBar(int iClient, int iProgressTime)
