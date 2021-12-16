@@ -307,7 +307,18 @@ public int Menu_CallBack(Menu menu, MenuAction action, int client, int position)
 		}
 		else if (dize == 5)
 		{
-			Muzik = !Muzik;
+			if (!GameStart)
+			{
+				Muzik = !Muzik;
+				if (warden_iswarden(client) || CheckCommandAccess(client, "c4bulmaca_flag", ADMFLAG_ROOT))
+				{
+					C4BulmacaMenu().Display(client, 0);
+				}
+			}
+			else
+			{
+				PrintToChat(client, "[SM] \x07Oyun başladığı için ayarları yapamadım.");
+			}
 		}
 	}
 	else if (action == MenuAction_End)
