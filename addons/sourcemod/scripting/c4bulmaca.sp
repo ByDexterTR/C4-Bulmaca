@@ -11,6 +11,7 @@
 bool GameStart = false;
 bool Buldu[65] = { false, ... };
 bool g_OnceStopped[65] = { false, ... };
+bool Muzik = true;
 Handle client_timer[65] = { null, ... };
 int g_iPlayerPrevButtons[65] = { 0, ... };
 int client_checkc4[65] = { -1, ... };
@@ -21,18 +22,18 @@ int m_flProgressBarStartTime = 0;
 int m_iProgressBarDuration = 0;
 int m_iBlockingUseActionInProgress = 0;
 
+
 public Plugin myinfo = 
 {
 	name = "C4 Bulmaca", 
 	author = "ByDexter", 
 	description = "", 
-	version = "1.0", 
+	version = "1.2", 
 	url = "https://steamcommunity.com/id/ByDexterTR - ByDexter#5494"
 };
 
 public void OnPluginStart()
 {
-	ServerCommand("sv_turbophysics 0");
 	PrecacheModel("models/weapons/w_c4_planted.mdl");
 	RegConsoleCmd("sm_c4", Command_C4Bulmaca, "");
 	RegConsoleCmd("sm_c4bulmaca", Command_C4Bulmaca, "");
@@ -61,9 +62,6 @@ public void OnPluginEnd()
 
 public void OnMapStart()
 {
-	PrecacheSoundAny("bydexter/c4bulmaca/kahkaha.mp3");
-	AddFileToDownloadsTable("sound/bydexter/c4bulmaca/kahkaha.mp3");
-	PrecacheSoundAny("weapons/party_horn_01.wav");
 	GameStart = false;
 	C4 = 0, FakeC4 = 0;
 	char modelname[16];
@@ -73,6 +71,24 @@ public void OnMapStart()
 		if (StrContains(modelname, "saklanbac_c4") != -1)
 			RemoveEntity(i);
 	}
+	
+	PrecacheSoundAny("weapons/party_horn_01.wav");
+	
+	AddFileToDownloadsTable("sound/bydexter/thanos/bbnos_01/mainmenu.mp3");
+	PrecacheSoundAny("bydexter/thanos/bbnos_01/mainmenu.mp3");
+	AddFileToDownloadsTable("sound/bydexter/thanos/neckdeep_02/mainmenu.mp3");
+	PrecacheSoundAny("bydexter/thanos/neckdeep_02/mainmenu.mp3");
+	AddFileToDownloadsTable("sound/bydexter/thanos/sarahschachner_01/mainmenu.mp3");
+	PrecacheSoundAny("bydexter/thanos/sarahschachner_01/mainmenu.mp3");
+	AddFileToDownloadsTable("sound/bydexter/thanos/scarlxrd_01/mainmenu.mp3");
+	PrecacheSoundAny("bydexter/thanos/scarlxrd_01/mainmenu.mp3");
+	AddFileToDownloadsTable("sound/bydexter/thanos/scarlxrd_02/mainmenu.mp3");
+	PrecacheSoundAny("bydexter/thanos/scarlxrd_02/mainmenu.mp3");
+	AddFileToDownloadsTable("sound/bydexter/thanos/theverkkars_01/mainmenu.mp3");
+	PrecacheSoundAny("bydexter/thanos/theverkkars_01/mainmenu.mp3");
+	
+	AddFileToDownloadsTable("sound/bydexter/thanos/stone_sound/xp_rankdown_02.wav");
+	PrecacheSoundAny("bydexter/thanos/stone_sound/xp_rankdown_02.wav");
 }
 
 public Action Check_flag(int client, int args)
@@ -109,12 +125,21 @@ Menu C4BulmacaMenu()
 		menu.AddItem("2", "> C4 Yerleştir");
 		menu.AddItem("3", "> Sahte C4 Yerleştir");
 		menu.AddItem("4", "> C4 Sil");
+		if (Muzik)
+			menu.AddItem("5", "> Müzik: Açık");
+		else
+			menu.AddItem("5", "> Müzik: Kapalı");
 	}
 	else
 	{
 		menu.AddItem("2", "> C4'ü Yerleştir", ITEMDRAW_DISABLED);
 		menu.AddItem("3", "> Sahte C4 Yerleştir", ITEMDRAW_DISABLED);
 		menu.AddItem("4", "> C4'ü Sil", ITEMDRAW_DISABLED);
+		
+		if (Muzik)
+			menu.AddItem("5", "> Müzik: Açık", ITEMDRAW_DISABLED);
+		else
+			menu.AddItem("5", "> Müzik: Kapalı", ITEMDRAW_DISABLED);
 	}
 	return menu;
 }
@@ -149,9 +174,27 @@ public int Menu_CallBack(Menu menu, MenuAction action, int client, int position)
 				{
 					Buldu[i] = false;
 				}
+				EmitSoundToAllAny("bydexter/thanos/stone_sound/xp_rankdown_02.wav", SOUND_FROM_PLAYER, 1, 50);
 			}
 			else
 			{
+				if (Muzik)
+				{
+					int Sarki = GetRandomInt(1, 6);
+					if (Sarki == 1)
+						EmitSoundToAllAny("bydexter/thanos/bbnos_01/mainmenu.mp3", SOUND_FROM_PLAYER, 1, 30);
+					else if (Sarki == 2)
+						EmitSoundToAllAny("bydexter/thanos/sarahschachner_01/mainmenu.mp3", SOUND_FROM_PLAYER, 1, 30);
+					else if (Sarki == 3)
+						EmitSoundToAllAny("bydexter/thanos/scarlxrd_01/mainmenu.mp3", SOUND_FROM_PLAYER, 1, 30);
+					else if (Sarki == 4)
+						EmitSoundToAllAny("bydexter/thanos/scarlxrd_02/mainmenu.mp3", SOUND_FROM_PLAYER, 1, 30);
+					else if (Sarki == 5)
+						EmitSoundToAllAny("bydexter/thanos/theverkkars_01/mainmenu.mp3", SOUND_FROM_PLAYER, 1, 30);
+					else if (Sarki == 6)
+						EmitSoundToAllAny("bydexter/thanos/neckdeep_02/mainmenu.mp3", SOUND_FROM_PLAYER, 1, 30);
+				}
+				
 				PrintToChatAll("[SM] \x04%N\x01 C4 bulmacayı \x05başlattı.", client);
 				PrintToChatAll("[SM] \x04C4\x01: %d \x10| \x04Sahte C4\x01: %d", C4, FakeC4);
 				for (int i = 1; i <= MaxClients; i++)if (IsValidClient(i))
@@ -172,7 +215,7 @@ public int Menu_CallBack(Menu menu, MenuAction action, int client, int position)
 			{
 				float location[3];
 				GetAimCoords(client, location);
-				location[2] += 24.0;
+				location[2] += 1.0;
 				int c4 = CreateEntityByName("prop_physics_override");
 				DispatchKeyValue(c4, "model", "models/weapons/w_c4_planted.mdl");
 				DispatchKeyValue(c4, "physicsmode", "1");
@@ -181,8 +224,13 @@ public int Menu_CallBack(Menu menu, MenuAction action, int client, int position)
 				SetEntProp(c4, Prop_Send, "m_CollisionGroup", 0);
 				SetEntPropString(c4, Prop_Data, "m_iName", "saklanbac_c4");
 				DispatchSpawn(c4);
+				SetEntityMoveType(c4, MOVETYPE_NONE);
 				SDKHook(c4, SDKHook_SetTransmit, SetTransmit);
-				TeleportEntity(c4, location, NULL_VECTOR, NULL_VECTOR);
+				float angle[3];
+				GetEntPropVector(c4, Prop_Data, "m_angRotation", angle);
+				GetClientEyeAngles(client, angle);
+				angle[2] = 0.0; angle[0] = 0.0;
+				TeleportEntity(c4, location, angle, NULL_VECTOR);
 				C4++;
 				if (warden_iswarden(client) || CheckCommandAccess(client, "c4bulmaca_flag", ADMFLAG_ROOT))
 				{
@@ -200,7 +248,7 @@ public int Menu_CallBack(Menu menu, MenuAction action, int client, int position)
 			{
 				float location[3];
 				GetAimCoords(client, location);
-				location[2] += 24.0;
+				location[2] += 1.0;
 				int c4 = CreateEntityByName("prop_physics_override");
 				DispatchKeyValue(c4, "model", "models/weapons/w_c4_planted.mdl");
 				DispatchKeyValue(c4, "physicsmode", "1");
@@ -209,8 +257,13 @@ public int Menu_CallBack(Menu menu, MenuAction action, int client, int position)
 				SetEntProp(c4, Prop_Send, "m_CollisionGroup", 0);
 				SetEntPropString(c4, Prop_Data, "m_iName", "saklanbac_c4_f");
 				DispatchSpawn(c4);
+				SetEntityMoveType(c4, MOVETYPE_NONE);
 				SDKHook(c4, SDKHook_SetTransmit, SetTransmit);
-				TeleportEntity(c4, location, NULL_VECTOR, NULL_VECTOR);
+				float angle[3];
+				GetEntPropVector(c4, Prop_Data, "m_angRotation", angle);
+				GetClientEyeAngles(client, angle);
+				angle[2] = 0.0; angle[0] = 0.0;
+				TeleportEntity(c4, location, angle, NULL_VECTOR);
 				FakeC4++;
 				if (warden_iswarden(client) || CheckCommandAccess(client, "c4bulmaca_flag", ADMFLAG_ROOT))
 				{
@@ -252,6 +305,10 @@ public int Menu_CallBack(Menu menu, MenuAction action, int client, int position)
 				PrintToChat(client, "[SM] \x07Oyun başladığı için ayarları yapamadım.");
 			}
 		}
+		else if (dize == 5)
+		{
+			Muzik = !Muzik;
+		}
 	}
 	else if (action == MenuAction_End)
 	{
@@ -283,9 +340,9 @@ public Action OnPlayerRunCmd(int client, int &iButtons)
 					GetEntPropString(ent, Prop_Data, "m_iName", modelname, 16);
 					if (StrContains(modelname, "saklanbac_c4") != -1)
 					{
-						SetProgressBar(client, 5);
+						SetProgressBar(client, 3);
 						client_checkc4[client] = ent;
-						client_timer[client] = CreateTimer(5.0, c4kontrol, client, TIMER_FLAG_NO_MAPCHANGE);
+						client_timer[client] = CreateTimer(3.0, c4kontrol, client, TIMER_FLAG_NO_MAPCHANGE);
 						g_OnceStopped[client] = true;
 					}
 				}
@@ -330,7 +387,6 @@ public Action c4kontrol(Handle timer, int client)
 			GetEntPropString(client_checkc4[client], Prop_Data, "m_iName", modelname, 16);
 			if (strcmp(modelname, "saklanbac_c4_f") == 0)
 			{
-				EmitSoundToAllAny("bydexter/c4bulmaca/kahkaha.mp3");
 				RemoveEntity(client_checkc4[client]);
 				FakeC4--;
 				PrintToChat(client, "[SM] Bu \x10C4\x01 sahte :D \x04Seni kandırdım \x07asla bulamazsın gerçeği.");
@@ -374,6 +430,7 @@ public Action c4kontrol(Handle timer, int client)
 						if (StrContains(modelname, "saklanbac_c4") != -1)
 							RemoveEntity(i);
 					}
+					EmitSoundToAllAny("bydexter/thanos/stone_sound/xp_rankdown_02.wav", SOUND_FROM_PLAYER, 1, 50);
 				}
 				else
 				{
@@ -444,7 +501,7 @@ public void CreateParticle(int ent, char[] particleType, float time)
 		AcceptEntityInput(particle, "start");
 		CreateTimer(time, DeleteParticle, particle);
 	}
-	EmitSoundToAllAny("weapons/party_horn_01.wav");
+	EmitSoundToAllAny("weapons/party_horn_01.wav", SOUND_FROM_PLAYER, 2, 20);
 }
 
 public Action DeleteParticle(Handle timer, any particle)
